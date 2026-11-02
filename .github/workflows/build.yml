@@ -23,6 +23,8 @@ jobs:
         run: |
           npm install @capacitor/android@^7.4.3
           npx cap add android
+mkdir -p www
+cp "index.html " www/index.html
           npx cap sync android
           cd android
           chmod +x gradlew
