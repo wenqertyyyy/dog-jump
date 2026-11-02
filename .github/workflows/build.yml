@@ -1,4 +1,3 @@
-
 name: Build DOG JUMP APK
 
 on:
@@ -22,9 +21,9 @@ jobs:
       - name: Build Android
         run: |
           npm install @capacitor/android@^7.4.3
+          mkdir -p www
+          cp "index.html " www/index.html
           npx cap add android
-mkdir -p www
-cp "index.html " www/index.html
           npx cap sync android
           cd android
           chmod +x gradlew
@@ -35,3 +34,4 @@ cp "index.html " www/index.html
         with:
           name: DOG-JUMP-APK
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          
