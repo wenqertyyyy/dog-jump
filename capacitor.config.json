@@ -1,5 +1,5 @@
 {
   "appId": "com.dogjump.game",
   "appName": "DOG JUMP",
-  "webDir": "."
+  "webDir": "www"
 }
