@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DOG JUMP</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;background:#101018;color:white;
+ font-family:Arial,sans-serif;text-align:center;
+ overflow:hidden;touch-action:manipulation
+}
+#game{max-width:500px;margin:auto;padding:15px}
+h1{font-size:38px;margin:15px;color:#ffcf40}
+#stats{display:flex;justify-content:space-around;font-size:18px;margin:15px}
+canvas{width:100%;background:linear-gradient(#202b46,#101018);border:3px solid #ffcf40;border-radius:16px}
+button{
+ background:#ffcf40;border:0;border-radius:12px;
+ padding:14px 25px;font-size:18px;font-weight:bold;
+ margin:8px;color:#171717
+}
+#message{font-size:20px;min-height:30px}
+</style>
+</head>
+<body>
+<div id="game">
+<h1>🐶 DOG JUMP</h1>
+<div id="stats">
+<span>⭐ Очки: <b id="score">0</b></span>
+<span>🏆 Рекорд: <b id="best">0</b></span>
+</div>
+<canvas id="canvas" width="460" height="400"></canvas>
+<div id="message">Нажми «ИГРАТЬ»!</div>
+<button id="start">ИГРАТЬ</button>
+<button id="jump">ПРЫЖОК ↑</button>
+</div>
+<script>
+const c=document.getElementById("canvas");
+const ctx=c.getContext("2d");
+const scoreEl=document.getElementById("score");
+const bestEl=document.getElementById("best");
+const message=document.getElementById("message");
+let best=Number(localStorage.getItem("dogBest")||0);
+bestEl.textContent=best;
+let dog,obstacles,score,running,frame,speed;
+
+function reset(){
+ dog={x:75,y:300,vy:0,size:38,ground:true};
+ obstacles=[];score=0;frame=0;speed=5;
+ scoreEl.textContent=0;running=true;
+ message.textContent="Прыгай через препятствия!";
+}
+
+function jump(){
+ if(running&&dog.ground){dog.vy=-13;dog.ground=false}
+}
+document.getElementById("start").onclick=()=>{
+ reset();loop();
+};
+document.getElementById("jump").onclick=jump;
+c.addEventListener("pointerdown",jump);
+document.addEventListener("keydown",e=>{
+ if(e.code==="Space"||e.code==="ArrowUp")jump();
+});
+
+function drawDog(){
+ ctx.font="38px Arial";
+ ctx.fillText("🐶",dog.x,dog.y+dog.size);
+}
+function loop(){
+ if(!running)return;
+ ctx.clearRect(0,0,460,400);
+ ctx.fillStyle="#26334a";
+ ctx.fillRect(0,340,460,60);
+ ctx.fillStyle="#63748e";
+ ctx.fillRect(0,340,460,4);
+
+ dog.vy+=0.65;dog.y+=dog.vy;
+ if(dog.y>=300){dog.y=300;dog.vy=0;dog.ground=true}
+ drawDog();
+
+ frame++;
+ if(frame%85===0){
+ obstacles.push({x:470,y:305,w:27,h:35});
+ }
+ obstacles.forEach(o=>{
+ o.x-=speed;
+ ctx.fillStyle="#ff6b48";
+ ctx.fillRect(o.x,o.y,o.w,o.h);
+ ctx.fillStyle="#ffb34c";
+ ctx.fillRect(o.x+5,o.y+5,8,8);
+ if(dog.x+30>o.x&&dog.x+8<o.x+o.w&&dog.y+35>o.y){
+ running=false;
+ message.textContent="💥 Игра окончена! Очки: "+score;
+ if(score>best){
+ best=score;localStorage.setItem("dogBest",best);
+ bestEl.textContent=best;
+ }
+ document.getElementById("start").textContent="ЕЩЁ РАЗ";
+ }
+ });
+ obstacles=obstacles.filter(o=>o.x>-40);
+ if(!running)return;
+ if(frame%6===0){
+ score++;scoreEl.textContent=score;
+ }
+ if(frame%500===0)speed+=0.5;
+ requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
